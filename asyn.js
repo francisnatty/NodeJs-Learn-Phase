@@ -4,21 +4,53 @@
 //Async/await
 
 
-console.log('Before');
-getUser(1, getRepositories);
+// console.log('Before');
+// getUser(1, getRepositories);
 
-function getRepositories(user) {
-    getRepositories(user.githHubUsername, getCommits
-    );
-}
-function getCommits(repos) {
-    getCommits(repo, displayCommits)
+// function getRepositories(user) {
+//     getRepositories(user.githHubUsername, getCommits
+//     );
+// }
+// function getCommits(repos) {
+//     getCommits(repo, displayCommits)
+
+// }
+
+// function displayCommits(commits) {
+//     console.log(commits);
+// }
+
+
+// getUser(1).then(user=> getRepositories(user.id),)
+// .then(repos=> getCommits(repos[0]))
+// .then(commits => console.log('Commits',commits))
+// .catch(err=> console.log('Error',err.message)),
+
+//Aynsc and Await approach
+async function displayCommits (){
+
+    try{
+
+const user= await getUser(1);
+//console.log(username.)
+const respos= await  getRepositories(user.githHubUsername);
+const commits=await getCommits(repos[0]);
+console.log(commits);
+
+    }catch(err){
+        console.log('Error', err.message)
+
+    }
+
+
 
 }
 
-function displayCommits(commits) {
-    console.log(commits);
-}
+displayCommits();
+
+
+
+
 
 
 
@@ -33,23 +65,35 @@ setTimeout(() => {
    
 }
 
-function getRepositories(username, callback) {
-       
-    setTimeout(() => {
-        console.log('Calling Github APi.....',);
-        callback(['repo1', 'repo2', 'repo3']);
+function getRepositories(username) {
 
-    }, 2000)
+    return new Promise((resolve, reject)=>{
+
+        setTimeout(() => {
+            console.log('Calling Github APi.....',);
+           // resolve(['repo1', 'repo2', 'repo3']);
+           reject(new Error('Could not get the repos'));
+    
+        }, 2000);
+
+    })
+       
+  
 
 
 }
 
-function getCommits(repo,callback){
-    setTimeout(()=> {
-        console.log('Calling GithHub APT....');
-        callback(['commit']);
+function getCommits(repo){
+    return new Promise((resolve,reject)=>{
 
-    },2000)
+        setTimeout(()=> {
+            console.log('Calling GithHub APT....');
+            resolve(['commit']);
+    
+        },2000)
+
+    })
+  
 }
 
 // a promise is a n object that holds the eventual result of an asynchronous operation
