@@ -12,35 +12,73 @@ mongoose.connect('mongodb+srv://Natty:Natty247**@cluster0.wnpx8.mongodb.net/play
     .catch(err => console.log('Could not connect to MongoDB.....', err))
 
 const courseSchema = new mongoose.Schema({
-    name: {type: String, required : true },
+    name: { type: String, required: true, minLength: 5, maxLength: 255, },
     author: String,
-    tags: [String],
+    category: {
+        type: String,
+        required: true,
+        enum: ['web', 'mobile', 'network'],
+        lowercase: true,
+        trim: true
+    },
+    tags: {
+        type: Array,
+        validate: {
+            isAsync: true,
+            validator: function (v, callback) {
+
+                setTimeout(() => {
+                    //Do some async work
+                    const result = v && v.length > 0;
+                    callback(result);
+
+                }, 4000)
+
+
+
+
+            },
+            message: 'A course should have atleast one tag.'
+        }
+    },
     date: { type: Date, default: Date.now },
     isPublished: Boolean,
+    price: {
+        type: Number,
+        required: function () { return this.isPublished },
+        min: 10,
+        max: 200,
+        get: v => Math.round(v),
+        set: v=> Math.round(v),
+
+    }
 })
 
 const Course = mongoose.model('Courses', courseSchema);
 
 async function createCourse() {
     const course = new Course({
-       // name: 'Node.js Course',
+        // name: 'Node.js Course',
         author: 'Mosh',
+        category: 'web',
         tags: ['angular', 'frontend'],
         isPublished: true,
     });
 
-    try{
-        // const result = await course.save();
-        // console.log(result);
+    try {
+        const result = await course.save();
+        console.log(result);
 
-      await  course.validate();
+        // await  course.validate();
 
-    }catch(err){
-        console.log(err.message);
+    } catch (err) {
+        for(field in err.errors)
+
+        console.log(err.errors[field].message);
 
     }
 
-  
+
 }
 
 createCourse();
@@ -93,7 +131,7 @@ async function updateCourse(id) {
             author: 'Natty',
             isPublished: false
         }
-    },{new: true} )
+    }, { new: true })
     // const course = await Course.findByIdAndUpdate(id, {
     //   isPublished: true,
     //   author: 'Another Author'
